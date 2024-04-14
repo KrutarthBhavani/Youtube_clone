@@ -1,5 +1,5 @@
 import express from "express";
-import connectDB from "./db";
+import connectDB from "./db/index.js";
 import cors from 'cors';
 import cookieParser from "cookie-parser";
 
@@ -35,5 +35,13 @@ app.use(cookieParser()) // user na browser ni cookie access OR set karva mate aa
 /*This is particularly useful for handling sessions, tracking user activity, or managing user preferences, 
  enhancing both the functionality and security of your web applications.*/
 
+
+
+ //routes import
+
+import userRouter from './routes/user.routes.js'
+
+//routes declration
+app.use("/api/v1/users", userRouter)
 
 export {app} 
