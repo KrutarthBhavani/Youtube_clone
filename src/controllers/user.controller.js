@@ -4,6 +4,21 @@ import {ApiError} from "../utils/ApiError.js"
 import {uploadOnClodinary} from "../utils/cloudinary.js"
 import {User} from "../models/user.model.js"
 
+const generateAccessAndRefreshTokens = async(userId)=>{
+    try {
+        const user = await User.findById(userId);
+        const accessToken = user.generateAccessToken()
+        const refreshToken = user.generateRefreshToken()
+
+        user.refreshToken = refreshToken
+        await user.save({ validateBeforeSave: false })
+
+        return {accessToken, refreshToken}
+    } catch (error) {
+        throw new ApiError(500,"Something Went wrong while generating Access & Refresh Token")
+    }
+}
+
 const registerUser = asyncHandler( async (req,res) => {
     // get user details from FrontEnd
     // validation - non empty
@@ -85,4 +100,25 @@ const registerUser = asyncHandler( async (req,res) => {
     )
 });
 
-export {registerUser}
+const loginUser = asyncHandler(async(req,res)=>{
+    // get data from user
+    // check for validation - empty value
+    // check if it is true credential or not
+    // access and refresh token
+    // send cookie
+
+    const {username, email, password} = req.body
+
+    if(!username || !email) throw new ApiError(400, "Username or email is required")
+
+    const user = User.findOne({
+        $or: [{email}, {username}]
+    })
+    if(!user) throw new ApiError(404,"User Does not exist")
+    
+    const isPasswordValid = await user.isPasswordCorrect(password)
+    if(!isPasswordValid) throw new ApiError(401,"Invalid User Credential")
+
+    const { accessToken, refreshToken} = await generateAccessAndRefreshTokens(user._id)
+})
+export {registerUser, loginUser}
