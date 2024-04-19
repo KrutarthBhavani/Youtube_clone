@@ -24,3 +24,4 @@ const uploadOnClodinary = async (localFilePath) =>{
         return null;
     }
 }
+export {uploadOnClodinary}
