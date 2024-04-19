@@ -41,7 +41,14 @@ const registerUser = asyncHandler( async (req,res) => {
     /* it is just like option, if files are there, it will perform the
     operation, otherwise leave it as it is. */
     const avatarLocalPath= req.files?.avatar[0]?.path
-    const coverImageLocalPath = req.files?.coverImage[0]?.path
+    
+
+    let coverImageLocalPath
+    if(req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length > 0){
+        coverImageLocalPath = req.files.coverImage[0].path
+    }
+    // this is pure javascript if-else condition. if user uploaded coverImage then only we have to save it
+
 
     // check for images, check for avatar only
     if(!avatarLocalPath){
